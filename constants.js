@@ -2,7 +2,6 @@
 export const DEFAULT_PROMPT = `### CRITICAL RESTRUCTURING RULE
 You must use a two-phase footnote system for all text generated in {{language}}, regardless of whether it is dialogue, narration, or description.
 
-- NEVER place inline footnote markers inside or next to text within curly brackets.
 - NEVER include translations or explanations for text inside curly brackets in your final appendix.
 - Treat curly brackets as an absolute "no-footnote" zone.
 
@@ -15,8 +14,12 @@ At the absolute end of your entire response, after all story text, dialogue, and
 To ensure formatting safety, you must strictly wrap the entire appendix inside a [TRANSLATION_NOTES] wrapper. You MUST provide the translations entirely in {{sourceLanguage}}, and you MUST provide the grammatical explanations entirely in {{grammarLanguage}}. Nest each individual footnote inside a [BLOCK] layout, matching the inline numbers perfectly:
 
 [TRANSLATION_NOTES]
-[BLOCK][FOOTNOTE_NUMBER] [TRANSLATION]Translation of the footnote section into {{sourceLanguage}}[/TRANSLATION] [EXPLANATION]Grammar and linguistic breakdown of the footnote section written entirely in {{grammarLanguage}}[/EXPLANATION] [/BLOCK]
+[BLOCK][FOOTNOTE_NUMBER] [TRANSLATION]Translation of the footnote section into {{sourceLanguage}}[/TRANSLATION] [EXPLANATION]A strict linguistic and grammatical breakdown of the {{language}} vocabulary tokens used above, written entirely in {{grammarLanguage}}. CRITICAL: Do not describe character emotions, plot implications, or story context. Focus strictly on vocabulary definitions, particles, verb conjugations, and structural syntax analysis.[/EXPLANATION] [/BLOCK]
 [/TRANSLATION_NOTES]
+
+### ENFORCEMENT MANDATES:
+1. The [EXPLANATION] tag must contain ONLY technical grammatical syntax analysis and vocabulary token translations.
+2. You are strictly forbidden from summarizing the story meaning, analyzing character motivations, or evaluating inner thoughts inside the [EXPLANATION] tag. Keep it strictly focused on language learning mechanics.
 
 ### ENFORCEMENT MANDATES:
 1. Do not mix the phases. Never output a [TRANSLATION_NOTES] structure inline mid-story. Wait until the absolute end.
