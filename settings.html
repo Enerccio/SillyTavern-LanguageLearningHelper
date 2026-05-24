@@ -1,0 +1,77 @@
+<div class="llh-settings-container">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <span class="inline-drawer-icon fas fa-language"></span><b data-i18n="{{title}}">{{title}}</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+
+        <div class="inline-drawer-content" style="display: none;">
+            <div>
+                <div class="flex-container justifyspacebetween alignitemscenter" style="margin: auto; width: fit-content;">
+                    <h4 class="textAlignCenter">Configuration Profiles</h4>
+                </div>
+            </div>
+
+            <div class="flex-container justifyspacebetween alignitemscenter">
+                <select id="llh-profile-selector" class="flex1 text_pole"></select>
+                <button id="llh-save-profile-as-btn" class="menu_button ctrl_btn fas fa-save" title="Save As Custom Profile..."></button>
+                <button id="llh-delete-profile-btn" class="menu_button ctrl_btn red-btn fas fa-trash" title="Delete Profile"></button>
+            </div>
+
+            <div class="form-group style-row">
+                <label>Bind Profile Context:</label>
+                <div class="flex-container widthFull" style="gap: 8px; margin-top: 4px;">
+                    <button id="llh-bind-char-btn" class="menu_button ctrl_btn" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <i class="fas fa-user-tag"></i> Bind to Character
+                    </button>
+                    <button id="llh-bind-chat-btn" class="menu_button ctrl_btn" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <i class="fas fa-comments"></i> Bind to Current Chat
+                    </button>
+                </div>
+                <div id="llh-bind-status-text" style="font-size: 0.85em; color: var(--golden); margin-top: 6px; font-style: italic; min-height: 1.2em;"></div>
+            </div>
+
+            <hr>
+
+            <label title="Remove instructions from prompt before review." class="checkbox_label">
+                <input type="checkbox" id="llh-profile-enabled" style="margin-right: 8px;" />
+                <span><b>Enable language tracking instructions for this specific profile</b></span>
+            </label>
+
+            <!-- Language Variable Configuration Fields -->
+            <div class="form-group">
+                <label for="llh-target-lang">Language to Learn (Target) {{language}}:</label>
+                <input type="text" id="llh-target-lang" class="text_pole" placeholder="e.g., Japanese, Spanish">
+            </div>
+
+            <div class="form-group">
+                <label for="llh-source-lang">Native/Translation Language {{sourceLanguage}}:</label>
+                <input type="text" id="llh-source-lang" class="text_pole" placeholder="e.g., English, French">
+            </div>
+
+            <div class="form-group">
+                <label for="llh-grammar-lang">Grammar Explanations Language {{grammarLanguage}}:</label>
+                <input type="text" id="llh-grammar-lang" class="text_pole" placeholder="e.g., Czech, English, Simple Japanese">
+            </div>
+
+            <hr>
+
+            <div class="form-group flex-container style-row">
+                <label>System Prompt Template Matrix:</label>
+                <button id="llh-edit-prompt-btn" class="menu_button fa-solid fa-pen-to-square"> Edit Prompt Template</button>
+            </div>
+
+            <label title="Remove instructions from prompt before review." class="checkbox_label">
+                <input type="checkbox" id="llh-profile-no-blur" style="margin-right: 8px;" />
+                <span><b>Reveal all translations and grammar notes immediately (Disable Blur)</b></span>
+            </label>
+
+            <hr>
+
+            <label title="Remove instructions from prompt before review." class="checkbox_label">
+                <input type="checkbox" id="llh-toggle-toasts" style="margin-right: 8px;" />
+                <span><b>Notify via popup toast when profile changes contextually</b></span>
+            </label>
+        </div>
+    </div>
+</div>

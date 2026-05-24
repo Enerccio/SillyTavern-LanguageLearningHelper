@@ -1,0 +1,12 @@
+{
+    "display_name": "LanguageLearningHelper",
+    "loading_order": 1,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "llh.css",
+    "author": "Enerccio",
+    "version": "1.0.0",
+    "homePage": "https://github.com/Enerccio/SillyTavern-LanguageLearningHelper",
+    "auto_update": true
+}

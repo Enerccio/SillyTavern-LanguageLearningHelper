@@ -1,0 +1,101 @@
+/* --- Core Footnote Block Layout --- */
+enerccio-llh-block {
+    display: block !important;
+    margin: 12px 0 !important;
+    padding: 10px 14px !important;
+    background-color: rgba(255, 255, 255, 0.04) !important; /* Force subtle visible contrast in dark themes */
+    border-left: 3px solid #4a90e2 !important;
+    border-radius: 4px !important;
+    font-size: 0.95em !important;
+    color: #b0b3b8 !important; /* Force readable text color for description fragments */
+}
+
+/* --- The Interactive Segments --- */
+enerccio-llh-translation,
+enerccio-llh-explanation {
+    display: inline-block !important;
+    position: relative !important;
+    cursor: pointer !important;
+    border-radius: 3px !important;
+    padding: 2px 6px !important;
+    margin: 2px 4px !important;
+    user-select: none !important;
+
+    /* FALLBACK: Provide a solid dark-gray spoiler background when blurred */
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: rgba(255, 255, 255, 0.15) !important; /* Force text to match background color so it can't clip/disappear */
+
+    /* The Blur Effect */
+    filter: blur(6px) !important;
+    transition: filter 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
+}
+
+/* Ensure any internal quotes added by SillyTavern inherit the hidden color state */
+enerccio-llh-translation *,
+enerccio-llh-explanation * {
+    color: inherit !important;
+}
+
+/* Distinct base colors for text structures when revealed */
+enerccio-llh-translation.unblurred,
+enerccio-llh-translation:hover {
+    color: #64b5f6 !important; /* Vibrant clear blue for translation text */
+}
+
+enerccio-llh-explanation.unblurred,
+enerccio-llh-explanation:hover {
+    color: #e0e0e0 !important; /* Soft white/light gray for grammar explanations */
+}
+
+/* --- The Reveal Trigger State --- */
+enerccio-llh-translation.unblurred,
+enerccio-llh-translation:hover,
+enerccio-llh-explanation.unblurred,
+enerccio-llh-explanation:hover {
+    filter: none !important;
+    background-color: rgba(0, 0, 0, 0.2) !important; /* Subtle box framing when active */
+}
+
+.llh-return-trigger:hover {
+    text-decoration: underline !important;
+    opacity: 0.8 !important;
+}
+
+@keyframes llhCardGlowPulse {
+    0% {
+        outline: 2px solid rgba(74, 144, 226, 0.8);
+        box-shadow: 0 0 12px rgba(74, 144, 226, 0.6);
+        background-color: rgba(74, 144, 226, 0.08) !important;
+    }
+    50% {
+        outline: 2px solid rgba(255, 152, 0, 0.6);
+        box-shadow: 0 0 16px rgba(255, 152, 0, 0.4);
+        background-color: rgba(255, 152, 0, 0.08) !important;
+    }
+    100% {
+        outline: 2px solid rgba(74, 144, 226, 0.0);
+        box-shadow: 0 0 0px rgba(74, 144, 226, 0);
+        background-color: rgba(255, 255, 255, 0.04) !important;
+    }
+}
+
+enerccio-llh-block.llh-pulse-highlight {
+    animation: llhCardGlowPulse 1.5s ease-out forwards !important;
+    transition: background-color 0.3s ease !important;
+}
+
+#chat.llh-no-blur-mode enerccio-llh-translation,
+#chat.llh-no-blur-mode enerccio-llh-explanation {
+    filter: none !important;
+    background-color: transparent !important;
+    cursor: text !important;
+    user-select: text !important;
+}
+
+/* Distinct native color assignments when global blur override mode is active */
+#chat.llh-no-blur-mode enerccio-llh-translation {
+    color: #64b5f6 !important;
+}
+#chat.llh-no-blur-mode enerccio-llh-explanation {
+    color: #e0e0e0 !important;
+}
