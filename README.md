@@ -11,7 +11,7 @@ Features include granular multi-tier configuration profiles, individual click-to
 * **Two-Phase Footnote Engine**: Keeps your immersion intact. The narrative remains clean with tiny inline markers (e.g., `[1]`), while complete translation datasets are neatly appended as an accordion summary block at the absolute end.
 * **Granular Blur Toggles**: Independent "spoiler-blur" mechanisms applied natively to vocabulary translations and grammar breakdowns. Click an entry to toggle its visibility permanently, or simply hover to peak.
 * **Context-Aware Profiles**: Save unique configurations into profiles. Multi-tiered binding priority automatically resolves active parameters on the fly:
-  \[\text{Chat Overrides} \longrightarrow \text{Character Binds} \longrightarrow \text{Global Settings}\]
+  **Chat Overrides** $\rightarrow$ **Character Binds** $\rightarrow$ **Global Settings**
 * **Universal Custom Templating**: Fully adjustable mustache-syntax variable replacement fields (`{{language}}`, `{{sourceLanguage}}`, `{{grammarLanguage}}`) allowing any-language-to-any-language tracking (even High-Level immersion setups!).
 * **Two-Way Document Navigation**: Clicking an inline marker programmatically expands the notes drawer and glides your viewport straight down to that exact footnote with a smooth glowing boundary pulse. Click the card index to snap right back up to the story text line.
 * **Safe Streaming Filter**: Intercepts tokens in real-time, stripping out messy unclosed tags mid-generation to render a clean, theme-matched processing text loader frames.
