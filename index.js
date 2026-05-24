@@ -162,6 +162,11 @@ async function processPrompt(data) {
 }
 
 $(async function () {
+    if (typeof MessageFormatter === 'undefined') {
+        console.error(`[LLH] Extension failed to load: This plugin requires the SillyTavern Staging branch to access the modern MessageFormatter pipeline.`);
+        return; // Safely abort loading without throwing uncaught execution crashes
+    }
+
     if (typeof DOMPurify !== 'undefined') {
         DOMPurify.addHook('uponSanitizeElement', (node, data) => {
             // Check if the current element matches any of your extension tags

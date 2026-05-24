@@ -74,6 +74,10 @@ To ensure formatting safety, you must strictly wrap the entire appendix inside a
 3. Crucially: The translation segment must be written in {{sourceLanguage}}, but the explanation segment must be written completely in {{grammarLanguage}}. Do not mix them up.
 ```
 
+## ⚠️ Prerequisites
+
+* **SillyTavern (Staging Branch)**: This extension strictly requires the latest **Staging** branch of SillyTavern. It relies on the modern `MessageFormatter` hooks pipeline to securely intercept and format stream tokens before rendering. It is **not** compatible with the current Release branch.
+
 ---
 
 ## 📥 Installation and File Layout
