@@ -155,9 +155,11 @@ async function processPrompt(data) {
         "grammarLanguage": activeConfig.grammarLanguage || "English"
     });
 
-    const lastMessageIndex = data.chat.length - 1;
-    if (lastMessageIndex >= 0 && data.chat[lastMessageIndex].role === 'user') {
-        data.chat[lastMessageIndex].content += `\n\n[SYSTEM INSTRUCTION: ${llhRuleBlock}]`;
+    for (let i = data.chat.length - 1; i >= 0; i--) {
+        if (data.chat[i].role === 'user') {
+            data.chat[i].content += `\n\n[SYSTEM INSTRUCTION: ${llhRuleBlock}]`;
+            return;
+        }
     }
 }
 
