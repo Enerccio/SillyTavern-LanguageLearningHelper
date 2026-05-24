@@ -40,7 +40,7 @@ The extension automatically registers several custom HTML5 Web Components native
 | Variable Template Token | Description                                    | Use-Case Examples |
 | :--- |:-----------------------------------------------| :--- |
 | `{{language}}` | The target language you are actively learning. | `Japanese`, `Kansai-ben`, `German`, `High Valyrian` |
-| `{{sourceLanguage}}` | Translation language.                          | `English`, `French`, `Klingon` |
+| `{{sourceLanguage}}` | Language you want translation to be in.        | `English`, `French`, `Klingon` |
 | `{{grammarLanguage}}`| The medium used to explain syntax components.  | `English`, `Czech`, `Simple Japanese with Spaces` |
 
 ---
