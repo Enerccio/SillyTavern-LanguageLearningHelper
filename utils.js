@@ -14,11 +14,9 @@ export function toast(message, type="info") {
 export const toastDebounced = debounce(toast, 500);
 
 export function cleanHistoryForLLM(messages) {
-    // Regex 1: Deletes the entire master appendix block wrapper and everything inside it
-    const appendixRegex = new RegExp(`<${TAG_NOTES}[^>]*>[\\s\\S]*?<\\/${TAG_NOTES}>`, 'gi');
+    const appendixRegex = /\[TRANSLATION_NOTES\][\s\S]*?\[\/TRANSLATION_NOTES\]/gi;
 
-    // Regex 2: Catches and completely wipes out your custom inline anchor elements
-    const inlineAnchorRegex = new RegExp(`<${TAG_ANCHOR}[^>]*>[\\s\\S]*?<\\/${TAG_ANCHOR}>`, 'gi');
+    const inlineAnchorRegex = /\[LLH_FN_[a-z0-9_-]+\]/gi;
 
     return messages.map(msg => {
         if (msg.role === 'assistant' && typeof msg.content === 'string') {
