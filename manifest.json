@@ -1,6 +1,6 @@
 {
     "display_name": "LanguageLearningHelper",
-    "loading_order": 1,
+    "loading_order": 3,
     "requires": [],
     "optional": [],
     "js": "index.js",
