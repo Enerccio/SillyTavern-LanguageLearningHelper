@@ -92,16 +92,29 @@ function openPromptTemplatePopupEditor() {
         </div>
     `;
 
+    // 1. Create a live variable to store the text before the popup closes
+    let capturedText = initialTextValue;
+
+    // 2. Track text changes in real-time
+    $(document).off('input', '#llh-modal-prompt-textarea').on('input', '#llh-modal-prompt-textarea', function() {
+        capturedText = $(this).val();
+    });
+
     callGenericPopup(modalHtml, POPUP_TYPE.CONFIRM, "", {
         okButton: "Save to Profile",
         cancelButton: "Cancel"
     }).then((isConfirmed) => {
+        // 3. Clean up the listener
+        $(document).off('input', '#llh-modal-prompt-textarea');
+
         if (!isConfirmed) return;
 
-        const textValue = $('#llh-modal-prompt-textarea').val()?.trim() || "";
+        // 4. Use our captured string instead of trying to read the destroyed DOM element
+        const textValue = capturedText?.trim() || "";
 
         if (profiles[activeProfile]) {
-            if (textValue === DEFAULT_PROMPT || !textValue) {
+            // 5. Add .trim() to DEFAULT_PROMPT so the strict comparison works correctly
+            if (textValue === DEFAULT_PROMPT.trim() || !textValue) {
                 profiles[activeProfile].customPromptOverride = "";
             } else {
                 profiles[activeProfile].customPromptOverride = textValue;
@@ -113,6 +126,7 @@ function openPromptTemplatePopupEditor() {
 
     $(document).off('click', '#llh-modal-reset-btn').on('click', '#llh-modal-reset-btn', () => {
         $('#llh-modal-prompt-textarea').val(DEFAULT_PROMPT);
+        capturedText = DEFAULT_PROMPT; // Ensure the reset action updates our live tracker
     });
 }
 

@@ -7,6 +7,7 @@ You must use a two-phase footnote system for all text generated in {{language}},
 
 ### PHASE 1: INLINE FOOTNOTE MARKERS
 Every time you complete a logical sentence or clause in {{language}} OUTSIDE of curly brackets, you must immediately append a simple, sequential numeric footnote marker inline (e.g., [LLH_FN_1], [LLH_FN_2]). Do not put any tags here.
+The prefix "LLH" in the footnote marker stands for LanguageLearningHelper. It is NOT a character name acronym. You must strictly use the exact prefix [LLH_FN_#] for ALL characters. Do not invent your own prefixes (e.g., do not use [MIY_FN_1] or [NES_FN_1]).
 
 ### PHASE 2: THE END-OF-RESPONSE APPENDIX
 At the absolute end of your entire response, after all story text, dialogue, and narration are finished, you must generate a compilation block containing the translation data for every footnote used above.
