@@ -11,7 +11,7 @@ import {DEFAULT_PROMPT} from "./constants.js";
 import {
     getActiveConfiguration,
     wireSettings
-} from "/scripts/extensions/third-party/SillyTavern-LanguageLearningHelper/settings.js";
+} from "./settings.js";
 
 class EnerccioLlhNotes extends HTMLElement {
     constructor() {
