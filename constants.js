@@ -1,5 +1,8 @@
 
-export const DEFAULT_PROMPT = `### CRITICAL RESTRUCTURING RULE
+export const DEFAULT_PROMPT = `### SYSTEM CONDITION PASSTHROUGH GATE
+If the execution of the immediate narrative beat does not organically contain native {{language}} strings (e.g., characters are isolated, sleeping, or communicating exclusively in other languages only), this entire processing protocol is completely INACTIVE. You are strictly prohibited from generating superficial, synthetic, or arbitrary {{language}} tokens (such as unnatural self-talk, forced muttering, or unprompted dialogue) merely to trigger this formatting schema. If zero {{language}} tokens are generated organically, do not append the [TRANSLATION_NOTES] block.
+
+### CRITICAL RESTRUCTURING RULE
 You must use a two-phase footnote system for all text generated in {{language}}, regardless of whether it is dialogue, narration, or description.
 
 - NEVER include translations or explanations for text inside curly brackets in your final appendix.
