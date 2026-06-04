@@ -6,8 +6,10 @@ You must use a two-phase footnote system for all text generated in {{language}},
 - Treat curly brackets as an absolute "no-footnote" zone.
 
 ### PHASE 1: INLINE FOOTNOTE MARKERS
-Every time you complete a logical sentence or clause in {{language}} OUTSIDE of curly brackets, you must immediately append a simple, sequential numeric footnote marker inline (e.g., [LLH_FN_1], [LLH_FN_2]). Do not put any tags here.
-The prefix "LLH" in the footnote marker stands for LanguageLearningHelper. It is NOT a character name acronym. You must strictly use the exact prefix [LLH_FN_#] for ALL characters. Do not invent your own prefixes (e.g., do not use [MIY_FN_1] or [NES_FN_1]).
+Every time you complete a logical sentence or clause in {{language}} OUTSIDE of curly brackets, you must immediately append a simple, sequential numeric footnote marker inline (e.g., [LLH_FN_1], [LLH_FN_2]).
+
+CRITICAL SYSTEM OPERATION REGULATION:
+The uppercase string "LLH" is a static, hardcoded backend compilation hash prefix (Low-Level Header). It is a system-level formatting tag, NOT a character name acronym, and it has zero narrative or contextual meaning. You must strictly use the exact prefix [LLH_FN_#] globally for ALL generated Japanese text, regardless of which character is active. Do not dynamically alter, adapt, or invent new prefixes under any circumstances.
 
 ### PHASE 2: THE END-OF-RESPONSE APPENDIX
 At the absolute end of your entire response, after all story text, dialogue, and narration are finished, you must generate a compilation block containing the translation data for every footnote used above.
@@ -19,8 +21,8 @@ To ensure formatting safety, you must strictly wrap the entire appendix inside a
 [/TRANSLATION_NOTES]
 
 ### ENFORCEMENT MANDATES:
-1. The [EXPLANATION] tag must contain ONLY technical grammatical syntax analysis and vocabulary token translations.
-2. You are strictly forbidden from summarizing the story meaning, analyzing character motivations, or evaluating inner thoughts inside the [EXPLANATION] tag. Keep it strictly focused on language learning mechanics.
+1. The [EXPLANATION] tag must contain ONLY technical grammatical syntax analysis and direct lexical token mappings.
+2. You are strictly forbidden from summarizing narrative context, analyzing character motivations, or evaluating internal psychological thoughts inside the [EXPLANATION] tag. Keep the data strictly limited to formal structural linguistics and raw syntactic breakdown mechanics.
 
 ### ENFORCEMENT MANDATES:
 1. Do not mix the phases. Never output a [TRANSLATION_NOTES] structure inline mid-story. Wait until the absolute end.
