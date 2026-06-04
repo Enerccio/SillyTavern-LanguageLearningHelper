@@ -163,6 +163,30 @@ async function processPrompt(data) {
     }
 }
 
+function cleanSingleMessage(textData, chatMessage, context = {}) {
+    if (chatMessage) {
+        let m = [{
+            role: chatMessage.role,
+            content: textData
+        }];
+        m = cleanHistoryForLLM(m)[0];
+        return [m.content, true];
+    }
+    return [textData, true];
+}
+
+function cleanBulkText(textData, context = {}) {
+    if (textData) {
+        let m = [{
+            role: 'assistant',
+            content: textData
+        }];
+        m = cleanHistoryForLLM(m)[0];
+        return [m.content, true];
+    }
+    return [textData, true];
+}
+
 $(async function () {
     if (typeof MessageFormatter === 'undefined') {
         console.error(`[LLH] Extension failed to load: This plugin requires the SillyTavern Staging branch to access the modern MessageFormatter pipeline.`);
@@ -205,4 +229,7 @@ $(async function () {
         stage: formatting_stage.BEFORE_REGEX,
         order: hook_order.EARLIEST
     });
+
+    window.enerccio_compat?.messageProcessor.registerHandler(cleanSingleMessage);
+    window.enerccio_compat?.textProcessor.registerHandler(cleanBulkText);
 });
