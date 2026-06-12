@@ -73,9 +73,9 @@ export function processInputStream(data, ctx) {
     // STEP 3: Handle real-time animation loading states
     if (removedAggressively) {
         const frames = [
-            ".", "..", "...",
-            "...P", "...Pr", "...Pro", "...Proc", "...Proce", "...Proces", "...Process", "...Processi", "...Processin", "...Processing",
-            "...Processing.", "...Processing..", "...Processing..."
+            "LLH .", "LLH ..", "LLH ...",
+            "LLH ...P", "LLH ...Pr", "LLH ...Pro", "LLH ...Proc", "LLH ...Proce", "LLH ...Proces", "LLH ...Process", "LLH ...Processi", "LLH ...Processin", "LLH ...Processing",
+            "LLH ...Processing.", "LLH ...Processing..", "LLH ...Processing..."
         ];
 
         const currentFrame = frames[llhmAnimationFrameCounter % frames.length];

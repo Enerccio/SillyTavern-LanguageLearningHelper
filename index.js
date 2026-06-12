@@ -152,96 +152,80 @@ class EnerccioLlhCoach extends HTMLElement {
         const messageElement = this.closest('.mes');
         const messageId = messageElement ? messageElement.getAttribute('mesid') : null;
 
-        if (messageId && (unblurredCoaches.has(messageId) || hoveredCoaches.has(messageId))) {
-            this.classList.add('unblurred');
+        const originalContent = this.innerHTML;
+        const isOpen = messageId && openedCoachDetails.has(messageId);
+        this.innerHTML = `
+                <details ${isOpen ? 'open' : ''}>
+                    <summary>Language Coaching Feedback</summary>
+                    <div class="llh-coach-content">
+                        ${originalContent}
+                    </div>
+                </details>
+            `;
+
+        const summaryElement = this.querySelector('summary');
+        if (summaryElement) {
+            summaryElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
         }
 
-        requestAnimationFrame(() => {
-            const style = window.getComputedStyle(this);
-            let lh = parseFloat(style.lineHeight);
-            if (isNaN(lh)) {
-                const fs = parseFloat(style.fontSize) || 15;
-                lh = fs * 1.4;
-            }
-            const paddingTop = parseFloat(style.paddingTop) || 0;
-            const paddingBottom = parseFloat(style.paddingBottom) || 0;
-            const contentHeight = this.offsetHeight - paddingTop - paddingBottom;
-
-            const isLong = (contentHeight / lh) > 2.2;
-
-            if (isLong) {
-                const originalContent = this.innerHTML;
-                this.classList.add('is-details');
-                const isOpen = messageId && openedCoachDetails.has(messageId);
-                this.innerHTML = `
-                        <details ${isOpen ? 'open' : ''}>
-                            <summary>Language Coaching Feedback</summary>
-                            <div class="llh-coach-content">
-                                ${originalContent}
-                            </div>
-                        </details>
-                    `;
-                const summaryElement = this.querySelector('summary');
-                if (summaryElement) {
-                    summaryElement.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                    });
+        const detailsElement = this.querySelector('details');
+        if (detailsElement && messageId) {
+            detailsElement.addEventListener('toggle', () => {
+                if (detailsElement.open) {
+                    openedCoachDetails.add(messageId);
+                } else {
+                    openedCoachDetails.delete(messageId);
                 }
-                const detailsElement = this.querySelector('details');
-                if (detailsElement && messageId) {
-                    detailsElement.addEventListener('toggle', () => {
-                        if (detailsElement.open) {
-                            openedCoachDetails.add(messageId);
-                        } else {
-                            openedCoachDetails.delete(messageId);
-                        }
-                    });
-                }
-            }
-        });
+            });
+        }
 
-        this.addEventListener('click', () => {
-            const currentMessageElement = this.closest('.mes');
-            const currentMessageId = currentMessageElement ? currentMessageElement.getAttribute('mesid') : null;
+        const targetElement = this.querySelector('.llh-coach-content');
 
-            this.classList.toggle('unblurred');
+        if (messageId && (unblurredCoaches.has(messageId) || hoveredCoaches.has(messageId))) {
+            targetElement.classList.add('unblurred');
+        }
 
-            if (currentMessageId) {
-                if (clickedCoaches.has(currentMessageId)) {
+        this.setupInteractions(targetElement, messageId);
+    }
+
+    setupInteractions(targetElement, messageId) {
+        targetElement.addEventListener('click', () => {
+            targetElement.classList.toggle('unblurred');
+
+            if (messageId) {
+                if (clickedCoaches.has(messageId)) {
                     // Disable clicked state -> restore hover logic
-                    clickedCoaches.delete(currentMessageId);
+                    clickedCoaches.delete(messageId);
                 } else {
                     // Enable clicked state -> reset and ignore hover logic
-                    clickedCoaches.add(currentMessageId);
-                    hoveredCoaches.delete(currentMessageId);
+                    clickedCoaches.add(messageId);
+                    hoveredCoaches.delete(messageId);
                 }
 
-                if (this.classList.contains('unblurred')) {
-                    unblurredCoaches.add(currentMessageId);
+                if (targetElement.classList.contains('unblurred')) {
+                    unblurredCoaches.add(messageId);
                 } else {
-                    unblurredCoaches.delete(currentMessageId);
+                    unblurredCoaches.delete(messageId);
                 }
             }
         });
 
-        this.addEventListener('mouseenter', () => {
-            const currentMessageElement = this.closest('.mes');
-            const currentMessageId = currentMessageElement ? currentMessageElement.getAttribute('mesid') : null;
-            if (currentMessageId) {
-                if (clickedCoaches.has(currentMessageId)) return;
-                hoveredCoaches.add(currentMessageId);
-                this.classList.add('unblurred');
+        targetElement.addEventListener('mouseenter', () => {
+            if (messageId) {
+                if (clickedCoaches.has(messageId)) return;
+                hoveredCoaches.add(messageId);
+                targetElement.classList.add('unblurred');
             }
         });
 
-        this.addEventListener('mouseleave', () => {
-            const currentMessageElement = this.closest('.mes');
-            const currentMessageId = currentMessageElement ? currentMessageElement.getAttribute('mesid') : null;
-            if (currentMessageId) {
-                if (clickedCoaches.has(currentMessageId)) return;
-                hoveredCoaches.delete(currentMessageId);
-                if (!unblurredCoaches.has(currentMessageId)) {
-                    this.classList.remove('unblurred');
+        targetElement.addEventListener('mouseleave', () => {
+            if (messageId) {
+                if (clickedCoaches.has(messageId)) return;
+                hoveredCoaches.delete(messageId);
+                if (!unblurredCoaches.has(messageId)) {
+                    targetElement.classList.remove('unblurred');
                 }
             }
         });

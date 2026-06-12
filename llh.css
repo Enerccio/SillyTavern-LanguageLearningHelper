@@ -1,4 +1,5 @@
 /* --- Core Footnote Block Layout --- */
+/* --- Core Footnote Block Layout --- */
 enerccio-llh-block {
     display: block !important;
     margin: 12px 0 !important;
@@ -16,8 +17,7 @@ enerccio-llh-coach {
     margin: 12px 0 16px 0 !important;
 }
 
-enerccio-llh-coach:not(.is-details),
-enerccio-llh-coach.is-details .llh-coach-content {
+enerccio-llh-coach .llh-coach-content {
     display: block !important;
     padding: 10px 14px !important;
     background-color: rgba(255, 255, 255, 0.04) !important;
@@ -33,7 +33,7 @@ enerccio-llh-coach.is-details .llh-coach-content {
     transition: filter 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
 }
 
-enerccio-llh-coach.is-details summary {
+enerccio-llh-coach summary {
     cursor: pointer !important;
     font-weight: bold !important;
     color: #ff9800 !important;
@@ -44,17 +44,14 @@ enerccio-llh-coach * {
     color: inherit !important;
 }
 
-enerccio-llh-coach:not(.is-details).unblurred,
-enerccio-llh-coach:not(.is-details):hover,
-enerccio-llh-coach.is-details.unblurred .llh-coach-content,
-enerccio-llh-coach.is-details:hover .llh-coach-content {
+enerccio-llh-coach .llh-coach-content.unblurred,
+enerccio-llh-coach .llh-coach-content:hover {
     filter: none !important;
     color: #ffb74d !important; /* Warm light-orange hue for coaching text */
     background-color: rgba(0, 0, 0, 0.2) !important;
 }
 
-#chat.llh-no-blur-mode enerccio-llh-coach:not(.is-details),
-#chat.llh-no-blur-mode enerccio-llh-coach.is-details .llh-coach-content {
+#chat.llh-no-blur-mode enerccio-llh-coach .llh-coach-content {
     filter: none !important;
     background-color: transparent !important;
     cursor: text !important;
