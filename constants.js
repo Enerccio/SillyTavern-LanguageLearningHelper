@@ -53,6 +53,7 @@ To ensure formatting safety, you must strictly wrap the entire appendix inside a
 
 export const DEFAULT_SETTINGS = {
     activeGlobalProfile: "Default",
+    defaultProfile: "Default",
     showContextToasts: true,
     profiles: {
         "Default": {

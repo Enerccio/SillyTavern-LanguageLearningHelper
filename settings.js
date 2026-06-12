@@ -40,7 +40,7 @@ export function resolveProfileContextName() {
         if (char?.avatar && characterBinds[char.avatar]) return characterBinds[char.avatar];
     }
 
-    return getSettings("activeGlobalProfile", "Default");
+    return getSettings("activeGlobalProfile", getSettings("defaultProfile", "Default"));
 }
 
 export function getActiveConfiguration() {
@@ -189,6 +189,7 @@ function syncAndRenderSettingsUI() {
     const profiles = getSettings("profiles", {"Default": {}});
     const globalActive = getSettings("activeGlobalProfile", "Default");
     const showToasts = getSettings("showContextToasts", true);
+    const defaultProfile = getSettings("defaultProfile", "Default");
 
     const dropdown = $('#llh-profile-selector');
     if (dropdown.length === 0) return; // Prevent executing before DOM injections land
@@ -208,6 +209,12 @@ function syncAndRenderSettingsUI() {
     $('#llh-source-lang').val(activeConfig.sourceLanguage || "English");
     $('#llh-grammar-lang').val(activeConfig.grammarLanguage || "English");
     $('#llh-toggle-toasts').prop('checked', showToasts);
+
+    if (globalActive === defaultProfile) {
+        $('#llh-make-default-profile-btn').addClass('menu_button_selected').attr('title', `This is currently your default fallback profile`);
+    } else {
+        $('#llh-make-default-profile-btn').removeClass('menu_button_selected').attr('title', `Set ${globalActive} as your default fallback profile`);
+    }
 
     // Dynamic UI enhancement: Gray out text fields if the configuration block is disabled
     const fields = $('#llh-target-lang, #llh-source-lang, #llh-grammar-lang, #llh-edit-prompt-btn, #llh-profile-coach-mode, #llh-edit-coach-prompt-btn');
@@ -286,6 +293,24 @@ function updateBindingStatusDisplay() {
     else $('#llh-bind-chat-btn').removeClass('menu_button_selected').attr('title', 'Force this specific chat history thread to always load the active profile');
 }
 
+function handleChatChangeDefaultSwitch() {
+    const context = SillyTavern.getContext();
+    const chatBinds = getSettings("chatBinds", {});
+    const characterBinds = getSettings("characterBinds", {});
+
+    let hasOverride = false;
+    if (context.chatId && chatBinds[context.chatId]) hasOverride = true;
+    if (context.characterId !== null && context.characterId !== undefined && context.characterId >= 0) {
+        const char = context.characters[context.characterId];
+        if (char?.avatar && characterBinds[char.avatar]) hasOverride = true;
+    }
+
+    if (!hasOverride) {
+        const defaultProf = getSettings("defaultProfile", "Default");
+        setSettings("activeGlobalProfile", defaultProf);
+    }
+}
+
 // ==========================================
 // INTERFACE BOILERPLATE INJECTION REGISTRY
 // ==========================================
@@ -302,6 +327,14 @@ export async function wireSettings() {
     loadModuleSettingsDatabase();
     syncAndRenderSettingsUI();
     lastResolvedProfileName = resolveProfileContextName();
+
+    $('#llh-make-default-profile-btn').off('click').on('click', (e) => {
+        e.stopPropagation();
+        const activeProfile = getSettings("activeGlobalProfile", "Default");
+        setSettings("defaultProfile", activeProfile);
+        toastr.success(`Profile [ ${activeProfile} ] set as the default fallback profile.`);
+        syncAndRenderSettingsUI();
+    });
 
     $('#llh-bind-char-btn').off('click').on('click', (e) => {
         e.stopPropagation();
@@ -419,6 +452,12 @@ export async function wireSettings() {
             const profiles = getSettings("profiles", {});
             delete profiles[activeName];
             setSettings("profiles", profiles);
+
+            // If the deleted profile was the default fallback, reset defaultProfile to Default
+            if (getSettings("defaultProfile") === activeName) {
+                setSettings("defaultProfile", "Default");
+            }
+
             setSettings("activeGlobalProfile", "Default");
             syncAndRenderSettingsUI();
             runContextTrackObserver();
@@ -427,10 +466,12 @@ export async function wireSettings() {
 
     // Automate session tracking hooks shifts (Update to refresh display bindings contextually)
     eventSource.on(event_types.CHAT_CHANGED, () => {
+        handleChatChangeDefaultSwitch();
         runContextTrackObserver();
         updateBindingStatusDisplay();
     });
     eventSource.on(event_types.CHAT_LOADED, () => {
+        handleChatChangeDefaultSwitch();
         runContextTrackObserver();
         updateBindingStatusDisplay();
     });
