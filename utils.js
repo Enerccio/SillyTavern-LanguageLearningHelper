@@ -1,4 +1,4 @@
-import {EXTENSION_NAME, TAG_ANCHOR, TAG_BLOCK, TAG_EXPLANATION, TAG_NOTES, TAG_TRANSLATION} from './conf.js';
+import {EXTENSION_NAME, TAG_ANCHOR, TAG_BLOCK, TAG_COACH, TAG_EXPLANATION, TAG_NOTES, TAG_TRANSLATION} from './conf.js';
 import {debounce} from "/scripts/utils.js";
 
 export function log() {
@@ -15,6 +15,7 @@ export const toastDebounced = debounce(toast, 500);
 
 export function cleanHistoryForLLM(messages) {
     const appendixRegex = /\[TRANSLATION_NOTES\][\s\S]*?\[\/TRANSLATION_NOTES\]/gi;
+    const coachRegex = /\[LLH_COACH\][\s\S]*?\[\/LLH_COACH\]/gi;
 
     const inlineAnchorRegex = /\[LLH_FN_[a-z0-9_-]+\]/gi;
 
@@ -22,7 +23,8 @@ export function cleanHistoryForLLM(messages) {
         if (msg.role === 'assistant' && typeof msg.content === 'string') {
             let cleanContent = msg.content
                 .replace(appendixRegex, '')
-                .replace(inlineAnchorRegex, '') // Removes the inline link tags entirely
+                .replace(coachRegex, '')
+                .replace(inlineAnchorRegex, '')
                 .trim();
 
             return { ...msg, content: cleanContent };
@@ -64,6 +66,8 @@ export function processInputStream(data, ctx) {
         .replace(/\[\/TRANSLATION\]/g, `</${TAG_TRANSLATION}>`)
         .replace(/\[EXPLANATION\]/g, `<${TAG_EXPLANATION}>`)
         .replace(/\[\/EXPLANATION\]/g, `</${TAG_EXPLANATION}>`)
+        .replace(/\[LLH_COACH\]/gi, `<${TAG_COACH}>`)
+        .replace(/\[\/LLH_COACH\]/gi, `</${TAG_COACH}>`)
 
         // Inline hyperlink parser runs smoothly now that the block prefix has been cleaned up
         .replace(/\[LLH_FN_(\d+)\]/g, `<${TAG_ANCHOR} data-fn="$1" data-llh-id="inline-$1">[$1]</${TAG_ANCHOR}>`);

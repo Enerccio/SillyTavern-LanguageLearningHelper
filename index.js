@@ -1,13 +1,13 @@
 import {
     TAG_ANCHOR,
-    TAG_BLOCK,
+    TAG_BLOCK, TAG_COACH,
     TAG_EXPLANATION, TAG_NOTES,
     TAG_TRANSLATION
 } from "./conf.js";
 import {formatting_stage, hook_order, MessageFormatter} from "/scripts/message-formatter.js";
 import {cleanHistoryForLLM, compilePromptTemplate, processInputStream} from "./utils.js";
 import {event_types, eventSource} from "/scripts/events.js";
-import {DEFAULT_PROMPT} from "./constants.js";
+import {COACH_PROMPT, DEFAULT_PROMPT} from "./constants.js";
 import {
     getActiveConfiguration,
     wireSettings
@@ -138,6 +138,17 @@ class EnerccioLlhAnchor extends HTMLElement {
     }
 }
 
+class EnerccioLlhCoach extends HTMLElement {
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        this.addEventListener('click', () => {
+            this.classList.toggle('unblurred');
+        });
+    }
+}
+
 async function processPrompt(data) {
     const activeConfig = getActiveConfiguration();
 
@@ -157,7 +168,15 @@ async function processPrompt(data) {
 
     for (let i = data.chat.length - 1; i >= 0; i--) {
         if (data.chat[i].role === 'user') {
-            data.chat[i].content += `\n\n[SYSTEM INSTRUCTION: ${llhRuleBlock}]`;
+            if (activeConfig.isCoachModeEnabled) {
+                const compiledCoach = compilePromptTemplate(activeConfig.coachPromptOverride || COACH_PROMPT, {
+                    "sourceLanguage": activeConfig.sourceLanguage || "English",
+                    "userPrompt": data.chat[i].content
+                });
+                data.chat[i].content = `${compiledCoach}\n\n${llhRuleBlock}`;
+            } else {
+                data.chat[i].content += `\n\n[SYSTEM INSTRUCTION: ${llhRuleBlock}]`;
+            }
             return;
         }
     }
@@ -197,11 +216,14 @@ $(async function () {
         DOMPurify.addHook('uponSanitizeElement', (node, data) => {
             // Check if the current element matches any of your extension tags
             const tagName = node.tagName ? node.tagName.toLowerCase() : '';
-            if (tagName === `${TAG_ANCHOR}` || tagName === `${TAG_NOTES}` || tagName === `${TAG_BLOCK}` || tagName === `${TAG_TRANSLATION}` || tagName === `${TAG_EXPLANATION}`) {
+            if (tagName === `${TAG_COACH}` || tagName === `${TAG_ANCHOR}` || tagName === `${TAG_NOTES}` || tagName === `${TAG_BLOCK}` || tagName === `${TAG_TRANSLATION}` || tagName === `${TAG_EXPLANATION}`) {
                 // Force DOMPurify to whitelist this specific node and keep its elements intact
                 data.allowedTags[tagName] = true;
             }
         });
+    }
+    if (!customElements.get(`${TAG_COACH}`)) {
+        customElements.define(`${TAG_COACH}`, EnerccioLlhCoach);
     }
     if (!customElements.get(`${TAG_NOTES}`)) {
         customElements.define(`${TAG_NOTES}`, EnerccioLlhNotes);

@@ -1,9 +1,9 @@
-import {DEFAULT_PROMPT, DEFAULT_SETTINGS} from "./constants.js";
+import {COACH_PROMPT, DEFAULT_PROMPT, DEFAULT_SETTINGS} from "./constants.js";
 import {callGenericPopup, POPUP_TYPE} from "/scripts/popup.js";
 import {event_types, eventSource} from "/scripts/events.js";
 import {toastDebounced} from "./utils.js";
 import {EXTENSION_NAME, EXTENSION_PATH, MODULE_NAME, VERSION} from "./conf.js";
-import {extension_settings, renderExtensionTemplateAsync} from "/scripts/extensions.js";
+import {renderExtensionTemplateAsync} from "/scripts/extensions.js";
 import {saveSettingsDebounced} from "/script.js";
 
 const $ = jQuery;
@@ -52,7 +52,8 @@ export function getActiveConfiguration() {
         targetLanguage: "Japanese",
         sourceLanguage: "English",
         grammarLanguage: "English",
-        customPromptOverride: ""
+        customPromptOverride: DEFAULT_PROMPT,
+        coachPromptOverride: COACH_PROMPT,
     };
 }
 
@@ -130,6 +131,57 @@ function openPromptTemplatePopupEditor() {
     });
 }
 
+function openCoachPromptTemplatePopupEditor() {
+    const profiles = getSettings("profiles", {});
+    const activeProfile = getSettings("activeGlobalProfile", "Default");
+    const currentConfig = profiles[activeProfile] || {};
+
+    const currentCustomText = currentConfig.coachPrompt || "";
+    const initialTextValue = currentCustomText || COACH_PROMPT;
+
+    const modalHtml = `
+            <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <p>Modify the background Coach Prompt instructions for profile: <b>[ ${activeProfile} ]</b>.</p>
+                <textarea id="llh-modal-coach-prompt-textarea" class="text_pole" style="height: 350px; font-family: monospace; width: 100%; resize: vertical;">${initialTextValue}</textarea>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                    <button id="llh-modal-coach-reset-btn" class="menu_button btn-secondary">Restore Baseline Default</button>
+                </div>
+            </div>
+        `;
+
+    let capturedText = initialTextValue;
+
+    $(document).off('input', '#llh-modal-coach-prompt-textarea').on('input', '#llh-modal-coach-prompt-textarea', function() {
+        capturedText = $(this).val();
+    });
+
+    callGenericPopup(modalHtml, POPUP_TYPE.CONFIRM, "", {
+        okButton: "Save to Profile",
+        cancelButton: "Cancel"
+    }).then((isConfirmed) => {
+        $(document).off('input', '#llh-modal-coach-prompt-textarea');
+
+        if (!isConfirmed) return;
+
+        const textValue = capturedText?.trim() || "";
+
+        if (profiles[activeProfile]) {
+            if (textValue === COACH_PROMPT.trim() || !textValue) {
+                profiles[activeProfile].coachPromptOverride = "";
+            } else {
+                profiles[activeProfile].coachPromptOverride = textValue;
+            }
+            setSettings("profiles", profiles);
+            toastDebounced(`Coach prompt updated for profile: [ ${activeProfile} ]`);
+        }
+    });
+
+    $(document).off('click', '#llh-modal-coach-reset-btn').on('click', '#llh-modal-coach-reset-btn', () => {
+        $('#llh-modal-coach-prompt-textarea').val(COACH_PROMPT);
+        capturedText = COACH_PROMPT;
+    });
+}
+
 // ==========================================
 // UI SYNCHRONIZATION AND RENDER MANAGEMENT
 // ==========================================
@@ -151,13 +203,14 @@ function syncAndRenderSettingsUI() {
 
     $('#llh-profile-enabled').prop('checked', isEnabled);
     $('#llh-profile-no-blur').prop('checked', activeConfig.isBlurDisabled ?? false);
+    $('#llh-profile-coach-mode').prop('checked', activeConfig.isCoachModeEnabled ?? false);
     $('#llh-target-lang').val(activeConfig.targetLanguage || "Japanese");
     $('#llh-source-lang').val(activeConfig.sourceLanguage || "English");
     $('#llh-grammar-lang').val(activeConfig.grammarLanguage || "English");
     $('#llh-toggle-toasts').prop('checked', showToasts);
 
     // Dynamic UI enhancement: Gray out text fields if the configuration block is disabled
-    const fields = $('#llh-target-lang, #llh-source-lang, #llh-grammar-lang, #llh-edit-prompt-btn');
+    const fields = $('#llh-target-lang, #llh-source-lang, #llh-grammar-lang, #llh-edit-prompt-btn, #llh-profile-coach-mode, #llh-edit-coach-prompt-btn');
     if (isEnabled) {
         fields.prop('disabled', false).css('opacity', '1');
     } else {
@@ -173,13 +226,15 @@ function saveActiveInputFields() {
         profiles[activeProfile] = {
             isProfileEnabled: $('#llh-profile-enabled').is(':checked'),
             isBlurDisabled: $('#llh-profile-no-blur').is(':checked'),
+            isCoachModeEnabled: $('#llh-profile-coach-mode').is(':checked'),
             targetLanguage: $('#llh-target-lang').val()?.trim() || "Japanese",
             sourceLanguage: $('#llh-source-lang').val()?.trim() || "English",
             grammarLanguage: $('#llh-grammar-lang').val()?.trim() || "English",
             customPromptOverride:
-                profiles[activeProfile].customPromptOverride || ""
-        }
-        ;
+                profiles[activeProfile].customPromptOverride || "",
+            coachPrompt:
+                profiles[activeProfile].coachPrompt || ""
+        };
         setSettings("profiles", profiles);
     }
 }
@@ -325,9 +380,18 @@ export async function wireSettings() {
         openPromptTemplatePopupEditor();
     });
 
+    $('#llh-edit-coach-prompt-btn').on('click', (e) => {
+        e.stopPropagation();
+        openCoachPromptTemplatePopupEditor();
+    });
+
     $('#llh-profile-no-blur').on('change', () => {
         saveActiveInputFields();
-        updateGlobalBlurModeClass(); // We will create this helper function right below!
+        updateGlobalBlurModeClass();
+    });
+
+    $('#llh-profile-coach-mode').on('change', () => {
+        saveActiveInputFields();
     });
 
     $('#llh-save-profile-as-btn').on('click', (e) => {

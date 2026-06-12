@@ -1,15 +1,29 @@
 
-export const DEFAULT_PROMPT = `### SYSTEM CONDITION PASSTHROUGH GATE
+
+export const COACH_PROMPT = `### PHASE 0: USER INPUT AUDIT PROTOCOL
+Analyze the IMMEDIATELY FOLLOWING user text for Japanese strings.
+
+1. CRITICAL SCOPE: Evaluate only the text bounded between the "USER_START" and "USER_END" tags below. Do not analyze previous chat history.
+2. CRITICAL CONDITION: If that text contains zero Japanese strings, completely omit the [LLH_COACH] block. Do not output empty tags or placeholder text.
+3. OUTPUT FORMAT: If Japanese is present, write a detailed grammatical critique entirely in {{sourceLanguage}}. Output it at the absolute top of your response, wrapped strictly inside [LLH_COACH] and [/LLH_COACH] tags, followed by a double newline.
+
+[USER_START]
+{{userPrompt}}
+[USER_END]`;
+
+export const DEFAULT_PROMPT = `### CORE MISSION: NARRATIVE CONTINUATION
+Advance the roleplay narrative seamlessly. Generate the next story beat, dialogue, and character actions by reacting directly to the events, choices, and dialogue provided by the user within the [USER_START] and [USER_END] tags above.
+
+### SYSTEM CONDITION PASSTHROUGH GATE
 If the execution of the immediate narrative beat does not organically contain native {{language}} strings (e.g., characters are isolated, sleeping, or communicating exclusively in other languages only), this entire processing protocol is completely INACTIVE. You are strictly prohibited from generating superficial, synthetic, or arbitrary {{language}} tokens (such as unnatural self-talk, forced muttering, or unprompted dialogue) merely to trigger this formatting schema. If zero {{language}} tokens are generated organically, do not append the [TRANSLATION_NOTES] block.
 
 ### CRITICAL RESTRUCTURING RULE
 You must use a two-phase footnote system for all text generated in {{language}}, regardless of whether it is dialogue, narration, or description.
 
-- NEVER include translations or explanations for text inside curly brackets in your final appendix.
-- Treat curly brackets as an absolute "no-footnote" zone.
+- NEVER include translations or explanations for text inside [USER_START] and [USER_END] in your final appendix.
 
 ### PHASE 1: INLINE FOOTNOTE MARKERS
-Every time you complete a logical sentence or clause in {{language}} OUTSIDE of curly brackets, you must immediately append a simple, sequential numeric footnote marker inline (e.g., [LLH_FN_1], [LLH_FN_2]).
+Every time you complete a logical sentence or clause in {{language}} OUTSIDE of [USER_START] and [USER_END], you must immediately append a simple, sequential numeric footnote marker inline (e.g., [LLH_FN_1], [LLH_FN_2]).
 
 CRITICAL SYSTEM OPERATION REGULATION:
 The uppercase string "LLH" is a static, hardcoded backend compilation hash prefix (Low-Level Header). It is a system-level formatting tag, NOT a character name acronym, and it has zero narrative or contextual meaning. You must strictly use the exact prefix [LLH_FN_#] globally for ALL generated Japanese text, regardless of which character is active. Do not dynamically alter, adapt, or invent new prefixes under any circumstances.
@@ -44,10 +58,12 @@ export const DEFAULT_SETTINGS = {
         "Default": {
             isProfileEnabled: true,
             isBlurDisabled: false,
+            isCoachModeEnabled: false,
             targetLanguage: "Japanese",
             sourceLanguage: "English",
             grammarLanguage: "English",
-            customPromptOverride: DEFAULT_PROMPT
+            customPromptOverride: DEFAULT_PROMPT,
+            coachPromptOverride: COACH_PROMPT
         }
     },
     characterBinds: {},

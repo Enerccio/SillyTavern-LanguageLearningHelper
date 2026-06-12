@@ -10,6 +10,43 @@ enerccio-llh-block {
     color: #b0b3b8 !important; /* Force readable text color for description fragments */
 }
 
+/* --- Coach Block State --- */
+enerccio-llh-coach {
+    display: block !important;
+    margin: 12px 0 16px 0 !important;
+    padding: 10px 14px !important;
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    border-left: 3px solid #ff9800 !important;
+    border-radius: 4px !important;
+    font-size: 0.95em !important;
+    cursor: pointer !important;
+    user-select: none !important;
+
+    /* Fallback blur state styles matching interactive elements */
+    color: rgba(255, 255, 255, 0.15) !important;
+    filter: blur(6px) !important;
+    transition: filter 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
+}
+
+enerccio-llh-coach * {
+    color: inherit !important;
+}
+
+enerccio-llh-coach.unblurred,
+enerccio-llh-coach:hover {
+    filter: none !important;
+    color: #ffb74d !important; /* Warm light-orange hue for coaching text */
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+#chat.llh-no-blur-mode enerccio-llh-coach {
+    filter: none !important;
+    background-color: transparent !important;
+    cursor: text !important;
+    user-select: text !important;
+    color: #ffb74d !important;
+}
+
 /* --- The Interactive Segments --- */
 enerccio-llh-translation,
 enerccio-llh-explanation {
