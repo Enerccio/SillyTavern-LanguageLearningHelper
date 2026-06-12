@@ -5,7 +5,7 @@ Analyze the IMMEDIATELY FOLLOWING user text for Japanese strings.
 
 1. CRITICAL SCOPE: Evaluate only the text bounded between the "USER_START" and "USER_END" tags below. Do not analyze previous chat history.
 2. CRITICAL CONDITION: If that text contains zero Japanese strings, completely omit the [LLH_COACH] block. Do not output empty tags or placeholder text.
-3. OUTPUT FORMAT: If Japanese is present, write a detailed grammatical critique entirely in {{sourceLanguage}}. Output it at the absolute top of your response, wrapped strictly inside [LLH_COACH] and [/LLH_COACH] tags, followed by a double newline.
+3. OUTPUT FORMAT: If Japanese is present, write a detailed grammatical critique entirely in {{sourceLanguage}}. Output it at the absolute top of your response, wrapped strictly inside [LLH_COACH] and [/LLH_COACH] tags. You must force exactly two newlines immediately after the opening [LLH_COACH] tag, and exactly two newlines immediately before and after the closing [/LLH_COACH] tag.
 
 [USER_START]
 {{userPrompt}}

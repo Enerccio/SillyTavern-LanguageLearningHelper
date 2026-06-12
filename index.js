@@ -16,6 +16,7 @@ import {
 const unblurredCoaches = new Set();
 const hoveredCoaches = new Set();
 const clickedCoaches = new Set();
+const openedCoachDetails = new Set();
 
 class EnerccioLlhNotes extends HTMLElement {
     constructor() {
@@ -154,6 +155,50 @@ class EnerccioLlhCoach extends HTMLElement {
         if (messageId && (unblurredCoaches.has(messageId) || hoveredCoaches.has(messageId))) {
             this.classList.add('unblurred');
         }
+
+        requestAnimationFrame(() => {
+            const style = window.getComputedStyle(this);
+            let lh = parseFloat(style.lineHeight);
+            if (isNaN(lh)) {
+                const fs = parseFloat(style.fontSize) || 15;
+                lh = fs * 1.4;
+            }
+            const paddingTop = parseFloat(style.paddingTop) || 0;
+            const paddingBottom = parseFloat(style.paddingBottom) || 0;
+            const contentHeight = this.offsetHeight - paddingTop - paddingBottom;
+
+            const isLong = (contentHeight / lh) > 2.2;
+
+            if (isLong) {
+                const originalContent = this.innerHTML;
+                this.classList.add('is-details');
+                const isOpen = messageId && openedCoachDetails.has(messageId);
+                this.innerHTML = `
+                        <details ${isOpen ? 'open' : ''}>
+                            <summary>Language Coaching Feedback</summary>
+                            <div class="llh-coach-content">
+                                ${originalContent}
+                            </div>
+                        </details>
+                    `;
+                const summaryElement = this.querySelector('summary');
+                if (summaryElement) {
+                    summaryElement.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
+                }
+                const detailsElement = this.querySelector('details');
+                if (detailsElement && messageId) {
+                    detailsElement.addEventListener('toggle', () => {
+                        if (detailsElement.open) {
+                            openedCoachDetails.add(messageId);
+                        } else {
+                            openedCoachDetails.delete(messageId);
+                        }
+                    });
+                }
+            }
+        });
 
         this.addEventListener('click', () => {
             const currentMessageElement = this.closest('.mes');
@@ -305,12 +350,14 @@ $(async function () {
         unblurredCoaches.clear();
         hoveredCoaches.clear();
         clickedCoaches.clear();
+        openedCoachDetails.clear();
     });
 
     eventSource.on(event_types.CHAT_LOADED, () => {
         unblurredCoaches.clear();
         hoveredCoaches.clear();
         clickedCoaches.clear();
+        openedCoachDetails.clear();
     });
 
     MessageFormatter.addHook(processInputStream, {

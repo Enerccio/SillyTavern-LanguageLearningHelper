@@ -89,25 +89,50 @@ export function processInputStream(data, ctx) {
     return normalizedData;
 }
 
-export function processCoachTags(data) {
+export function processCoachTags(data, ctx) {
     if (typeof data !== 'string') return data;
+    if (ctx.isReasoning) return data;
 
     let normalized = data
-        .replace(/<p>\s*\[LLH_COACH\]/gi, `<${TAG_COACH}><p>`)
-        .replace(/\[\/LLH_COACH\]\s*<\/p>/gi, `</p></${TAG_COACH}>`);
+        .replace(/(<p>)?\s*\[LLH_COACH\]/gi, (match, pTag) => {
+            return pTag ? `<${TAG_COACH}><p>` : `<${TAG_COACH}>`;
+        })
+        .replace(/\[\/LLH_COACH\]\s*(<\/p>)?/gi, (match, pTag) => {
+            return pTag ? `</p></${TAG_COACH}>` : `</${TAG_COACH}>`;
+        });
 
-    // const coachRegex = new RegExp(`<${TAG_COACH}>([\\s\\S]*?)</${TAG_COACH}>`, 'gi');
-    // normalized = normalized.replace(coachRegex, (match, content) => {
-    //     const escapedContent = content
-    //         .replace(/「/g, '&#12300;')
-    //         .replace(/」/g, '&#12301;')
-    //         .replace(/"/g, '&quot;')
-    //         .replace(/“/g, '&#8220;')
-    //         .replace(/”/g, '&#8221;')
-    //         .replace(/『/g, '&#12302;')
-    //         .replace(/』/g, '&#12303;');
-    //     return `<${TAG_COACH}>${escapedContent}</${TAG_COACH}>`;
-    // });
+    const coachRegex = new RegExp(`<${TAG_COACH}>([\\s\\S]*?)</${TAG_COACH}>`, 'gi');
+    normalized = normalized.replace(coachRegex, (match, content) => {
+        let escapedContent = content
+            .replace(/「/g, '&#12300;')
+            .replace(/」/g, '&#12301;')
+            .replace(/"/g, '&quot;')
+            .replace(/“/g, '&#8220;')
+            .replace(/”/g, '&#8221;')
+            .replace(/『/g, '&#12302;')
+            .replace(/』/g, '&#12303;');
+
+        // Clean up empty paragraph tags and breaks inside the coach block
+        escapedContent = escapedContent
+            .replace(/<p>\s*<\/p>/gi, '')
+            .replace(/<p>\s*<br\s*\/?>\s*<\/p>/gi, '')
+            .replace(/^(?:\s*<br\s*\/?>)+/gi, '')  // Strip leading breaks
+            .replace(/(?:\s*<br\s*\/?>)+$/gi, ''); // Strip trailing breaks
+
+        // Remove all whitespace between the tags and the outer content boundaries
+        escapedContent = escapedContent
+            .replace(/^\s*(?=<)/g, '')   // Strip whitespace between tag coach and first <
+            .replace(/(?<=>)\s*$/g, '');  // Strip whitespace between last > and /tag coach
+
+        return `<${TAG_COACH}>${escapedContent}</${TAG_COACH}>`;
+    });
+
+    // Clean up empty paragraphs immediately adjacent to the coach block
+    const emptyBeforeRegex = new RegExp(`<p>\\s*</p>\\s*<${TAG_COACH}>`, 'gi');
+    const emptyAfterRegex = new RegExp(`</${TAG_COACH}>\\s*<p>\\s*</p>`, 'gi');
+    normalized = normalized
+        .replace(emptyBeforeRegex, `<${TAG_COACH}>`)
+        .replace(emptyAfterRegex, `</${TAG_COACH}>`);
 
     return normalized;
 }
