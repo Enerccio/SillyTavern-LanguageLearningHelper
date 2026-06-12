@@ -43,7 +43,7 @@ export function processInputStream(data, ctx) {
     let cleanStreamData = data;
 
     // STEP 1: Lookahead scanner checking for trailing unclosed stream tokens at the edge ($)
-    const safeLookaheadRegex = /(?:\[TRANSLATION_NOTES\](?![\s\S]*?\[\/TRANSLATION_NOTES\])[\s\S]*|\[BLOCK\](?![\s\S]*?\[\/BLOCK\])[\s\S]*)$/i;
+    const safeLookaheadRegex = /(?:\[TRANSLATION_NOTES\](?![\s\S]*?\[\/TRANSLATION_NOTES\])[\s\S]*|\[BLOCK\](?![\s\S]*?\[\/BLOCK\])[\s\S]*|\[LLH_COACH\](?![\s\S]*?\[\/LLH_COACH\])[\s\S]*)$/i;
 
     if (safeLookaheadRegex.test(data)) {
         cleanStreamData = data.replace(safeLookaheadRegex, '');
@@ -66,8 +66,6 @@ export function processInputStream(data, ctx) {
         .replace(/\[\/TRANSLATION\]/g, `</${TAG_TRANSLATION}>`)
         .replace(/\[EXPLANATION\]/g, `<${TAG_EXPLANATION}>`)
         .replace(/\[\/EXPLANATION\]/g, `</${TAG_EXPLANATION}>`)
-        .replace(/\[LLH_COACH\]/gi, `<${TAG_COACH}>`)
-        .replace(/\[\/LLH_COACH\]/gi, `</${TAG_COACH}>`)
 
         // Inline hyperlink parser runs smoothly now that the block prefix has been cleaned up
         .replace(/\[LLH_FN_(\d+)\]/g, `<${TAG_ANCHOR} data-fn="$1" data-llh-id="inline-$1">[$1]</${TAG_ANCHOR}>`);
@@ -89,6 +87,29 @@ export function processInputStream(data, ctx) {
     }
 
     return normalizedData;
+}
+
+export function processCoachTags(data) {
+    if (typeof data !== 'string') return data;
+
+    let normalized = data
+        .replace(/<p>\s*\[LLH_COACH\]/gi, `<${TAG_COACH}><p>`)
+        .replace(/\[\/LLH_COACH\]\s*<\/p>/gi, `</p></${TAG_COACH}>`);
+
+    // const coachRegex = new RegExp(`<${TAG_COACH}>([\\s\\S]*?)</${TAG_COACH}>`, 'gi');
+    // normalized = normalized.replace(coachRegex, (match, content) => {
+    //     const escapedContent = content
+    //         .replace(/「/g, '&#12300;')
+    //         .replace(/」/g, '&#12301;')
+    //         .replace(/"/g, '&quot;')
+    //         .replace(/“/g, '&#8220;')
+    //         .replace(/”/g, '&#8221;')
+    //         .replace(/『/g, '&#12302;')
+    //         .replace(/』/g, '&#12303;');
+    //     return `<${TAG_COACH}>${escapedContent}</${TAG_COACH}>`;
+    // });
+
+    return normalized;
 }
 
 

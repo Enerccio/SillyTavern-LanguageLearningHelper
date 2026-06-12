@@ -21,6 +21,7 @@ enerccio-llh-coach {
     font-size: 0.95em !important;
     cursor: pointer !important;
     user-select: none !important;
+    white-space: pre-wrap !important;
 
     /* Fallback blur state styles matching interactive elements */
     color: rgba(255, 255, 255, 0.15) !important;

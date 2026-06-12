@@ -5,13 +5,17 @@ import {
     TAG_TRANSLATION
 } from "./conf.js";
 import {formatting_stage, hook_order, MessageFormatter} from "/scripts/message-formatter.js";
-import {cleanHistoryForLLM, compilePromptTemplate, processInputStream} from "./utils.js";
+import {cleanHistoryForLLM, compilePromptTemplate, processCoachTags, processInputStream} from "./utils.js";
 import {event_types, eventSource} from "/scripts/events.js";
 import {COACH_PROMPT, DEFAULT_PROMPT} from "./constants.js";
 import {
     getActiveConfiguration,
     wireSettings
 } from "./settings.js";
+
+const unblurredCoaches = new Set();
+const hoveredCoaches = new Set();
+const clickedCoaches = new Set();
 
 class EnerccioLlhNotes extends HTMLElement {
     constructor() {
@@ -142,9 +146,59 @@ class EnerccioLlhCoach extends HTMLElement {
     constructor() {
         super();
     }
+
     connectedCallback() {
+        const messageElement = this.closest('.mes');
+        const messageId = messageElement ? messageElement.getAttribute('mesid') : null;
+
+        if (messageId && (unblurredCoaches.has(messageId) || hoveredCoaches.has(messageId))) {
+            this.classList.add('unblurred');
+        }
+
         this.addEventListener('click', () => {
+            const currentMessageElement = this.closest('.mes');
+            const currentMessageId = currentMessageElement ? currentMessageElement.getAttribute('mesid') : null;
+
             this.classList.toggle('unblurred');
+
+            if (currentMessageId) {
+                if (clickedCoaches.has(currentMessageId)) {
+                    // Disable clicked state -> restore hover logic
+                    clickedCoaches.delete(currentMessageId);
+                } else {
+                    // Enable clicked state -> reset and ignore hover logic
+                    clickedCoaches.add(currentMessageId);
+                    hoveredCoaches.delete(currentMessageId);
+                }
+
+                if (this.classList.contains('unblurred')) {
+                    unblurredCoaches.add(currentMessageId);
+                } else {
+                    unblurredCoaches.delete(currentMessageId);
+                }
+            }
+        });
+
+        this.addEventListener('mouseenter', () => {
+            const currentMessageElement = this.closest('.mes');
+            const currentMessageId = currentMessageElement ? currentMessageElement.getAttribute('mesid') : null;
+            if (currentMessageId) {
+                if (clickedCoaches.has(currentMessageId)) return;
+                hoveredCoaches.add(currentMessageId);
+                this.classList.add('unblurred');
+            }
+        });
+
+        this.addEventListener('mouseleave', () => {
+            const currentMessageElement = this.closest('.mes');
+            const currentMessageId = currentMessageElement ? currentMessageElement.getAttribute('mesid') : null;
+            if (currentMessageId) {
+                if (clickedCoaches.has(currentMessageId)) return;
+                hoveredCoaches.delete(currentMessageId);
+                if (!unblurredCoaches.has(currentMessageId)) {
+                    this.classList.remove('unblurred');
+                }
+            }
         });
     }
 }
@@ -247,8 +301,24 @@ $(async function () {
         await processPrompt(data);
     });
 
+    eventSource.on(event_types.CHAT_CHANGED, () => {
+        unblurredCoaches.clear();
+        hoveredCoaches.clear();
+        clickedCoaches.clear();
+    });
+
+    eventSource.on(event_types.CHAT_LOADED, () => {
+        unblurredCoaches.clear();
+        hoveredCoaches.clear();
+        clickedCoaches.clear();
+    });
+
     MessageFormatter.addHook(processInputStream, {
         stage: formatting_stage.BEFORE_REGEX,
+        order: hook_order.EARLIEST
+    });
+    MessageFormatter.addHook(processCoachTags, {
+        stage: formatting_stage.AFTER_MARKDOWN,
         order: hook_order.EARLIEST
     });
 
