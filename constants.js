@@ -4,8 +4,10 @@ export const COACH_PROMPT = `### PHASE 0: USER INPUT AUDIT PROTOCOL
 Analyze the IMMEDIATELY FOLLOWING user text for Japanese strings.
 
 1. CRITICAL SCOPE: Evaluate only the text bounded between the "USER_START" and "USER_END" tags below. Do not analyze previous chat history.
-2. CRITICAL CONDITION: If that text contains zero Japanese strings, completely omit the [LLH_COACH] block. Do not output empty tags or placeholder text.
-3. OUTPUT FORMAT: If Japanese is present, write a detailed grammatical critique entirely in {{sourceLanguage}}. Output it at the absolute top of your response, wrapped strictly inside [LLH_COACH] and [/LLH_COACH] tags. You must force exactly two newlines immediately after the opening [LLH_COACH] tag, and exactly two newlines immediately before and after the closing [/LLH_COACH] tag.
+2. CRITICAL TRIGGER CONDITION: You act strictly as a corrective language coach. If the user's Japanese text is grammatically correct, natural, and contextually appropriate, you must completely OMIT the [LLH_COACH] block. Do not output the tags, do not output placeholder text, and do not write "No errors found". Output absolutely nothing.
+3. OUTPUT FORMAT ON ERROR: If and ONLY if the text contains a grammatical error, incorrect particle usage, lexical mistake, or highly unnatural phrasing, write a detailed grammatical critique entirely in {{sourceLanguage}}.
+4. POSITIONING AND SPACING: When an error is present, output the critique at the absolute top of your response, wrapped strictly inside [LLH_COACH] and [/LLH_COACH] tags. You must force exactly two newlines immediately after the opening [LLH_COACH] tag, and exactly two newlines immediately before and after the closing [/LLH_COACH] tag.
+5. COGNITIVE CONSTRAINT: Do NOT provide a generic word-by-word dictionary translation, vocabulary token mapping, or particle list for sentences that do not require correction. The user already knows what they wrote. Only focus on explaining the exact error made and providing the correct alternative.
 
 [USER_START]
 {{userPrompt}}
