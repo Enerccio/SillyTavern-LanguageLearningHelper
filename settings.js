@@ -52,6 +52,7 @@ export function getActiveConfiguration() {
         targetLanguage: "Japanese",
         sourceLanguage: "English",
         grammarLanguage: "English",
+        isTranslationsEnabled: true,
         customPromptOverride: DEFAULT_PROMPT,
         coachPromptOverride: COACH_PROMPT,
     };
@@ -192,7 +193,7 @@ function syncAndRenderSettingsUI() {
     const defaultProfile = getSettings("defaultProfile", "Default");
 
     const dropdown = $('#llh-profile-selector');
-    if (dropdown.length === 0) return; // Prevent executing before DOM injections land
+    if (dropdown.length === 0) return;
 
     dropdown.empty();
     Object.keys(profiles).forEach(pName => {
@@ -203,6 +204,7 @@ function syncAndRenderSettingsUI() {
     const isEnabled = activeConfig.isProfileEnabled ?? true;
 
     $('#llh-profile-enabled').prop('checked', isEnabled);
+    $('#llh-profile-translations-enabled').prop('checked', activeConfig.isTranslationsEnabled ?? true); // Bind to UI
     $('#llh-profile-no-blur').prop('checked', activeConfig.isBlurDisabled ?? false);
     $('#llh-profile-coach-mode').prop('checked', activeConfig.isCoachModeEnabled ?? false);
     $('#llh-target-lang').val(activeConfig.targetLanguage || "Japanese");
@@ -216,8 +218,8 @@ function syncAndRenderSettingsUI() {
         $('#llh-make-default-profile-btn').removeClass('menu_button_selected').attr('title', `Set ${globalActive} as your default fallback profile`);
     }
 
-    // Dynamic UI enhancement: Gray out text fields if the configuration block is disabled
-    const fields = $('#llh-target-lang, #llh-source-lang, #llh-grammar-lang, #llh-edit-prompt-btn, #llh-profile-coach-mode, #llh-edit-coach-prompt-btn');
+    // Add new checkbox ID to fields query array for automated graying out behavior
+    const fields = $('#llh-target-lang, #llh-source-lang, #llh-grammar-lang, #llh-edit-prompt-btn, #llh-profile-coach-mode, #llh-edit-coach-prompt-btn, #llh-profile-translations-enabled');
     if (isEnabled) {
         fields.prop('disabled', false).css('opacity', '1');
     } else {
@@ -232,6 +234,7 @@ function saveActiveInputFields() {
     if (profiles[activeProfile]) {
         profiles[activeProfile] = {
             isProfileEnabled: $('#llh-profile-enabled').is(':checked'),
+            isTranslationsEnabled: $('#llh-profile-translations-enabled').is(':checked'), // Capture checkbox data
             isBlurDisabled: $('#llh-profile-no-blur').is(':checked'),
             isCoachModeEnabled: $('#llh-profile-coach-mode').is(':checked'),
             targetLanguage: $('#llh-target-lang').val()?.trim() || "Japanese",
@@ -421,6 +424,10 @@ export async function wireSettings() {
     $('#llh-profile-no-blur').on('change', () => {
         saveActiveInputFields();
         updateGlobalBlurModeClass();
+    });
+
+    $('#llh-profile-translations-enabled').on('change', () => {
+        saveActiveInputFields();
     });
 
     $('#llh-profile-coach-mode').on('change', () => {

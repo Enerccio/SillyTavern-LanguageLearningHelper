@@ -13,9 +13,10 @@ Analyze the IMMEDIATELY FOLLOWING user text for Japanese strings.
 {{userPrompt}}
 [USER_END]`;
 
-export const DEFAULT_PROMPT = `### CORE MISSION: NARRATIVE CONTINUATION
-Advance the roleplay narrative seamlessly. Generate the next story beat, dialogue, and character actions by reacting directly to the events, choices, and dialogue provided by the user within the [USER_START] and [USER_END] tags above.
+export const NARRATIVE = `### CORE MISSION: NARRATIVE CONTINUATION
+Advance the roleplay narrative seamlessly. Generate the next story beat, dialogue, and character actions by reacting directly to the events, choices, and dialogue provided by the user within the [USER_START] and [USER_END] tags above.`
 
+export const DEFAULT_PROMPT = `
 ### SYSTEM CONDITION PASSTHROUGH GATE
 If the execution of the immediate narrative beat does not organically contain native {{language}} strings (e.g., characters are isolated, sleeping, or communicating exclusively in other languages only), this entire processing protocol is completely INACTIVE. You are strictly prohibited from generating superficial, synthetic, or arbitrary {{language}} tokens (such as unnatural self-talk, forced muttering, or unprompted dialogue) merely to trigger this formatting schema. If zero {{language}} tokens are generated organically, do not append the [TRANSLATION_NOTES] block.
 
@@ -62,6 +63,7 @@ export const DEFAULT_SETTINGS = {
             isProfileEnabled: true,
             isBlurDisabled: false,
             isCoachModeEnabled: false,
+            isTranslationsEnabled: true,
             targetLanguage: "Japanese",
             sourceLanguage: "English",
             grammarLanguage: "English",

@@ -7,7 +7,7 @@ import {
 import {formatting_stage, hook_order, MessageFormatter} from "/scripts/message-formatter.js";
 import {cleanHistoryForLLM, compilePromptTemplate, processCoachTags, processInputStream} from "./utils.js";
 import {event_types, eventSource} from "/scripts/events.js";
-import {COACH_PROMPT, DEFAULT_PROMPT} from "./constants.js";
+import {COACH_PROMPT, DEFAULT_PROMPT, NARRATIVE} from "./constants.js";
 import {
     getActiveConfiguration,
     wireSettings
@@ -242,12 +242,18 @@ async function processPrompt(data) {
     }
 
     data.chat = cleanHistoryForLLM(data.chat);
-    const sourcePromptMatrixText = activeConfig.customPromptOverride || DEFAULT_PROMPT;
-    const llhRuleBlock = compilePromptTemplate(sourcePromptMatrixText, {
-        "language": activeConfig.targetLanguage || "Japanese",
-        "sourceLanguage": activeConfig.sourceLanguage || "English",
-        "grammarLanguage": activeConfig.grammarLanguage || "English"
-    });
+
+    const isTranslationsEnabled = activeConfig.isTranslationsEnabled ?? true;
+
+    let llhRuleBlock = "";
+    if (isTranslationsEnabled) {
+        const sourcePromptMatrixText = activeConfig.customPromptOverride || DEFAULT_PROMPT;
+        llhRuleBlock = compilePromptTemplate(sourcePromptMatrixText, {
+            "language": activeConfig.targetLanguage || "Japanese",
+            "sourceLanguage": activeConfig.sourceLanguage || "English",
+            "grammarLanguage": activeConfig.grammarLanguage || "English"
+        });
+    }
 
     for (let i = data.chat.length - 1; i >= 0; i--) {
         if (data.chat[i].role === 'user') {
@@ -256,9 +262,17 @@ async function processPrompt(data) {
                     "sourceLanguage": activeConfig.sourceLanguage || "English",
                     "userPrompt": data.chat[i].content
                 });
-                data.chat[i].content = `${compiledCoach}\n\n${llhRuleBlock}`;
+
+                if (isTranslationsEnabled) {
+                    data.chat[i].content = `${compiledCoach}\n\n${NARRATIVE}\n${llhRuleBlock}`;
+                } else {
+                    data.chat[i].content = `${compiledCoach}\n\n${NARRATIVE}`;
+                }
             } else {
-                data.chat[i].content += `\n\n[SYSTEM INSTRUCTION: ${llhRuleBlock}]`;
+                if (isTranslationsEnabled) {
+                    data.chat[i].content += `\n\n[SYSTEM INSTRUCTION: ${llhRuleBlock}]`;
+                }
+                // If translations are disabled and Coach Mode is off, user prompt text is kept clean and unchanged
             }
             return;
         }
